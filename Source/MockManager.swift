@@ -16,7 +16,7 @@ private extension Array {
 }
 #endif
 
-public class MockManager {
+open class MockManager {
     public static var fail: ((message: String, sourceLocation: SourceLocation)) -> () = { (arg) in let (message, sourceLocation) = arg; XCTFail(message, file: sourceLocation.file, line: sourceLocation.line) }
     private var stubs: [Stub] = []
     private var stubCalls: [StubCall] = []
@@ -31,11 +31,11 @@ public class MockManager {
         self.hasParent = hasParent
     }
 
-    private func callInternal<IN, OUT>(_ method: String, parameters: IN, escapingParameters: IN, superclassCall: () -> OUT, defaultCall: () -> OUT) -> OUT {
+    open func callInternal<IN, OUT>(_ method: String, parameters: IN, escapingParameters: IN, superclassCall: () -> OUT, defaultCall: () -> OUT) -> OUT {
         return callRethrowsInternal(method, parameters: parameters, escapingParameters: escapingParameters, superclassCall: superclassCall, defaultCall: defaultCall)
     }
 
-    private func callRethrowsInternal<IN, OUT>(_ method: String, parameters: IN, escapingParameters: IN, superclassCall: () throws -> OUT, defaultCall: () throws -> OUT) rethrows -> OUT {
+    open func callRethrowsInternal<IN, OUT>(_ method: String, parameters: IN, escapingParameters: IN, superclassCall: () throws -> OUT, defaultCall: () throws -> OUT) rethrows -> OUT {
         let stubCall = ConcreteStubCall(method: method, parameters: escapingParameters)
         stubCalls.append(stubCall)
         unverifiedStubCallsIndexes.append(stubCalls.count - 1)
@@ -74,7 +74,7 @@ public class MockManager {
         }
     }
 
-    private func callThrowsInternal<IN, OUT>(_ method: String, parameters: IN, escapingParameters: IN, superclassCall: () throws -> OUT, defaultCall: () throws -> OUT) throws -> OUT {
+    open func callThrowsInternal<IN, OUT>(_ method: String, parameters: IN, escapingParameters: IN, superclassCall: () throws -> OUT, defaultCall: () throws -> OUT) throws -> OUT {
         let stubCall = ConcreteStubCall(method: method, parameters: escapingParameters)
         stubCalls.append(stubCall)
         unverifiedStubCallsIndexes.append(stubCalls.count - 1)
@@ -109,19 +109,19 @@ public class MockManager {
         }
     }
     
-    public func createStub<MOCK: ClassMock, IN, OUT>(for _: MOCK.Type, method: String, parameterMatchers: [ParameterMatcher<IN>]) -> ClassConcreteStub<IN, OUT> {
+    open func createStub<MOCK: ClassMock, IN, OUT>(for _: MOCK.Type, method: String, parameterMatchers: [ParameterMatcher<IN>]) -> ClassConcreteStub<IN, OUT> {
         let stub = ClassConcreteStub<IN, OUT>(method: method, parameterMatchers: parameterMatchers)
         stubs.insert(stub, at: 0)
         return stub
     }
 
-    public func createStub<MOCK: ProtocolMock, IN, OUT>(for _: MOCK.Type, method: String, parameterMatchers: [ParameterMatcher<IN>]) -> ConcreteStub<IN, OUT> {
+    open func createStub<MOCK: ProtocolMock, IN, OUT>(for _: MOCK.Type, method: String, parameterMatchers: [ParameterMatcher<IN>]) -> ConcreteStub<IN, OUT> {
         let stub = ConcreteStub<IN, OUT>(method: method, parameterMatchers: parameterMatchers)
         stubs.insert(stub, at: 0)
         return stub
     }
     
-    public func verify<IN, OUT>(_ method: String, callMatcher: CallMatcher, parameterMatchers: [ParameterMatcher<IN>], sourceLocation: SourceLocation) -> __DoNotUse<IN, OUT> {
+    open func verify<IN, OUT>(_ method: String, callMatcher: CallMatcher, parameterMatchers: [ParameterMatcher<IN>], sourceLocation: SourceLocation) -> __DoNotUse<IN, OUT> {
         var calls: [StubCall] = []
         var indexesToRemove: [Int] = []
         for (i, stubCall) in stubCalls.enumerated() {
@@ -139,7 +139,7 @@ public class MockManager {
         return __DoNotUse()
     }
 
-    public func enableSuperclassSpy() {
+    open func enableSuperclassSpy() {
         guard stubCalls.isEmpty else {
             failAndCrash("Enabling superclass spy is not allowed after stubbing! Please do that right after creating the mock.")
         }
@@ -150,7 +150,7 @@ public class MockManager {
         isSuperclassSpyEnabled = true
     }
 
-    public func enableDefaultStubImplementation() {
+    open func enableDefaultStubImplementation() {
         guard stubCalls.isEmpty else {
             failAndCrash("Enabling default stub implementation is not allowed after stubbing! Please do that right after creating the mock.")
         }
