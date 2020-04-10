@@ -19,13 +19,8 @@ Pod::Spec.new do |s|
   s.osx.deployment_target       = '10.9'
   #s.watchos.deployment_target   = '2.0' # watchos does not include XCTest framework :(
   s.tvos.deployment_target      = '9.0'
-  generator_name                = 'cuckoo_generator'
   s.swift_version               = '5.0'
-  s.preserve_paths              = ['Generator/**/*', 'run', 'build_generator', generator_name]
-  s.prepare_command             = <<-CMD
-                                    curl -Lo #{generator_name} https://github.com/Brightify/Cuckoo/releases/download/#{s.version}/#{generator_name}
-                                    chmod +x #{generator_name}
-                                CMD
+  s.preserve_paths              = ['Generator/**/*', 'run', 'build_generator']
   s.frameworks                  = 'XCTest', 'Foundation'
   s.requires_arc                = true
   s.pod_target_xcconfig         = {
@@ -43,7 +38,7 @@ Pod::Spec.new do |s|
   end
 
   s.subspec 'Swift' do |sub|
-    sub.source_files = 'Source/**/*.swift'
+    sub.source_files = 'Source/**/*.swift', 'Generator/cuckoo_generator'
   end
 
   s.subspec 'OCMock' do |sub|
